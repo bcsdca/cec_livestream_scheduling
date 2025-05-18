@@ -7,7 +7,12 @@ import { DateTime } from "luxon";
 const CREDENTIALS_PATH = "credentials.json";
 const TOKEN_PATH = "token.json";
 const SCOPES = ["https://www.googleapis.com/auth/youtube"];
-const PERSISTENT_STREAM_ID = "6GkALNcMtSUssrwWRXgGYQ1602798983344529"; // Sancturary Stream ID, base on the 868xxx stream key
+
+import { config } from './config.mjs';
+const { PERSISTENT_STREAM_ID_SANCTUARY } = config;
+
+const runTime = DateTime.now().setZone("America/Los_Angeles").toFormat("yyyy-MM-dd HH:mm:ss");
+console.log(`\n=== Script run at: ${runTime} PST ===`);
 
 async function authorize() {
   const credentials = JSON.parse(fs.readFileSync(CREDENTIALS_PATH));
@@ -79,14 +84,14 @@ async function createScheduledStream(auth) {
   await youtube.liveBroadcasts.bind({
     id: broadcastId,
     part: "id,contentDetails",
-    streamId: PERSISTENT_STREAM_ID,
+    streamId: PERSISTENT_STREAM_ID_SANCTUARY,
   });
 
   console.log("✅ Scheduled Cantonese livestream:");
   console.log(`- Title: ${title}`);
   console.log(`- Broadcast ID: ${broadcastId}`);
   console.log(`- Scheduled Time: ${sunday.toFormat("yyyy-MM-dd HH:mm")} PST`);
-  console.log(`- Bound Stream ID: ${PERSISTENT_STREAM_ID}`);
+  console.log(`- Bound Stream ID: ${PERSISTENT_STREAM_ID_SANCTUARY}`);
 }
 
 authorize().then(createScheduledStream).catch(console.error);
