@@ -1,0 +1,1 @@
+scp -i ~/.ssh/google_compute_engine /mnt/c/Users/shuib/cec_livestream_scheduling/token.json shui_bill_chu@34.105.123.239:/home/shui_bill_chu/cec_livestream_scheduling/token_wsl.json

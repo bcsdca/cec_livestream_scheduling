@@ -86,11 +86,6 @@ function getNextSundayDateTime(hour, minute) {
 
 async function scheduleLivestream(auth, titlePrefix, hour, minute, streamId) {
   const youtube = google.youtube({ version: "v3", auth });
-
-  if (!streamId) {
-    throw new Error(`Missing streamId for: ${titlePrefix}`);
-  }
-
   const sunday = getNextSundayDateTime(hour, minute);
   const formattedDate = sunday.toFormat("M/d/yy");
 
@@ -131,23 +126,18 @@ async function scheduleLivestream(auth, titlePrefix, hour, minute, streamId) {
     },
   });
 
-  const bindRes = await youtube.liveBroadcasts.bind({
+  await youtube.liveBroadcasts.bind({
     id: broadcastId,
     part: "id,contentDetails",
     streamId,
   });
-
-  const boundStreamId = bindRes.data.contentDetails?.boundStreamId;
-  if (!boundStreamId) {
-    throw new Error(`Failed to bind stream for: ${titlePrefix}`);
-  }
 
   const youtubeLink = `https://www.youtube.com/watch?v=${broadcastId}`;
 
   console.log(`✅ Scheduled livestream: ${title}`);
   console.log(`- Broadcast ID: ${broadcastId}`);
   console.log(`- Scheduled Time: ${sunday.toFormat("yyyy-MM-dd HH:mm")} PST`);
-  console.log(`- Bound Stream ID: ${boundStreamId}`);
+  console.log(`- Bound Stream ID: ${streamId}`);
   console.log(`- YouTube Link: ${youtubeLink}`);
   console.log("--------------------------------------------------");
 
