@@ -17,6 +17,7 @@ const CREDENTIALS_PATH = "credentials.json";
 const TOKEN_PATH = "token.json";
 const SCOPES = ["https://www.googleapis.com/auth/youtube"];
 
+// === Utility ===
 const runTime = DateTime.now().setZone("America/Los_Angeles").toFormat("yyyy-MM-dd HH:mm:ss");
 console.log(`\n=== Script run at: ${runTime} PST ===`);
 
@@ -141,44 +142,30 @@ async function scheduleLivestream(auth, titlePrefix, hour, minute, streamId) {
   console.log(`- YouTube Link: ${youtubeLink}`);
   console.log("--------------------------------------------------");
 
-  return { success: true, title, youtubeLink };
+  return { title, youtubeLink };
 }
 
-async function sendEmail(successes, failures) {
+async function sendEmail(links) {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: 'shui.bill.chu@gmail.com',
-      pass: 'tcmmgtogvtduznmt', // App password
+      user: 'shui.bill.chu@gmail.com', // Replace with your Gmail
+      pass: 'tcmmgtogvtduznmt',        // Your generated App Password
     },
   });
 
-  let emailBody = `Here are the results for the scheduled YouTube livestreams for this Sunday:\n\n`;
-
-  if (successes.length) {
-    emailBody += `✅ Successes:\n`;
-    emailBody += successes.map(s => `- ${s.title}\n  ${s.youtubeLink}`).join('\n\n');
-    emailBody += '\n\n';
-  } else {
-    emailBody += `✅ Successes: None\n\n`;
-  }
-
-  if (failures.length) {
-    emailBody += `❌ Failures:\n`;
-    emailBody += failures.map(f => `- ${f.title}\n  Error: ${f.error}`).join('\n\n');
-  } else {
-    emailBody += `❌ Failures: None`;
-  }
+  const emailBody = links.map(l => `${l.title}\n${l.youtubeLink}`).join('\n\n');
 
   await transporter.sendMail({
-    from: 'shui.bill.chu@gmail.com',
-    to: 'shui.bill.chu@gmail.com, coutlechu@gmail.com',
-    subject: 'CEC YouTube Livestream Scheduling Summary',
-    text: emailBody,
+    from: 'shui.bill.chu@gmail.com', // Replace with your Gmail
+    to: 'shui.bill.chu@gmail.com, coutlechu@gmail.com', // Multiple recipients separated by comma
+    subject: 'Scheduled CEC YouTube Livestreams',
+    text: `Here are the scheduled YouTube livestreams for this Sunday:\n\n${emailBody}`,
   });
 
   console.log("✅ Email sent to shui.bill.chu@gmail.com and coutlechu@gmail.com");
 }
+
 
 // === Main Script ===
 (async () => {
@@ -187,26 +174,14 @@ async function sendEmail(successes, failures) {
     const verified = await verifyChannel(auth);
     if (!verified) process.exit(1);
 
-    const streams = [
-      { title: "English Sunday Worship", hour: 9, minute: 30, streamId: PERSISTENT_STREAM_ID_SANCTUARY },
-      { title: "Mandarin Sunday Worship 國語主日崇拜", hour: 9, minute: 30, streamId: PERSISTENT_STREAM_ID_FELLOWSHIP },
-      { title: "Cantonese Sunday Worship 粵語主日崇拜", hour: 11, minute: 0, streamId: PERSISTENT_STREAM_ID_SANCTUARY },
+    const tasks = [
+      scheduleLivestream(auth, "English Sunday Worship", 9, 30, PERSISTENT_STREAM_ID_SANCTUARY),
+      scheduleLivestream(auth, "Mandarin Sunday Worship 國語主日崇拜", 9, 30, PERSISTENT_STREAM_ID_FELLOWSHIP),
+      scheduleLivestream(auth, "Cantonese Sunday Worship 粵語主日崇拜", 11, 0, PERSISTENT_STREAM_ID_SANCTUARY),
     ];
 
-    const successes = [];
-    const failures = [];
-
-    for (const s of streams) {
-      try {
-        const result = await scheduleLivestream(auth, s.title, s.hour, s.minute, s.streamId);
-        successes.push(result);
-      } catch (err) {
-        console.error(`❌ Failed to schedule: ${s.title}`, err.message);
-        failures.push({ title: s.title, error: err.message });
-      }
-    }
-
-    await sendEmail(successes, failures);
+    const results = await Promise.all(tasks);
+    await sendEmail(results);
   } catch (error) {
     console.error("❌ Error:", error);
     process.exit(1);

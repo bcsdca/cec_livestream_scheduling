@@ -4,18 +4,18 @@ This project automates the scheduling of weekly livestreams for the English, Man
 
 ## Features
 
-- Automated Scheduling
+1. Automated Scheduling
   Automatically schedules livestreams for all three congregations (English, Mandarin, and Cantonese) based on a predefined schedule.
   Current setup: All streams are scheduled for 9:30 PM every Friday.
   
-- Multi-Congregation Support
+2. Multi-Congregation Support
   Supports scheduling for English, Mandarin, and Cantonese services.
 
-- Configurable
+3. Configurable
   Settings and credentials are managed through configuration files (excluded from the repository for security).
 
-- Report
-  It will send email to Bill Chu, Jason Tong, Michael Kuo upon successful livestream scheduling. 
+4. Report
+  It will send email to Bill Chu, Jason Tong, Michael Kuo for successful or any failure msg during livestream scheduling. 
 
 
 - TBD
