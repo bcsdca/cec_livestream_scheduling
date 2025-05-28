@@ -198,8 +198,8 @@ async function sendEmail(successes, failures) {
     if (!verified) process.exit(1);
 
     const streams = [
-      { title: "English Sunday Worship", hour: 9, minute: 30, streamId: PERSISTENT_STREAM_ID_SANCTUARY },
-      { title: "Mandarin Sunday Worship 國語主日崇拜", hour: 9, minute: 30, streamId: PERSISTENT_STREAM_ID_FELLOWSHIP },
+      { title: "English Sunday Worship", hour: 9, minute: 15, streamId: PERSISTENT_STREAM_ID_SANCTUARY },
+      { title: "Mandarin Sunday Worship 國語主日崇拜", hour: 9, minute: 15, streamId: PERSISTENT_STREAM_ID_FELLOWSHIP },
       { title: "Cantonese Sunday Worship 粵語主日崇拜", hour: 11, minute: 0, streamId: PERSISTENT_STREAM_ID_SANCTUARY },
     ];
 
