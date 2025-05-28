@@ -180,14 +180,25 @@ async function sendEmail(successes, failures) {
     emailBody += `❌ Failures: None`;
   }
 
+  const recipientList = [
+    'shui.bill.chu@gmail.com',
+    'jasontong818@gmail.com',
+    'michael.s.kuo@gmail.com',
+  ];
+
+  //const recipientList = [
+  //  'shui.bill.chu@gmail.com',
+  //  'coutlechu@gmail.com',
+  //];
+
   await transporter.sendMail({
     from: 'shui.bill.chu@gmail.com',
-    to: 'shui.bill.chu@gmail.com, jasontong818@gmail.com, michael.s.kuo@gmail.com',
+    to: recipientList.join(', '), 
     subject: 'CEC YouTube Livestream Scheduling Summary',
     text: emailBody,
   });
 
-  console.log("✅ Email sent to shui.bill.chu@gmail.com and coutlechu@gmail.com");
+  console.log(`✅ Email sent to: ${recipientList.join(', ')}`);
 }
 
 // === Main Script ===
