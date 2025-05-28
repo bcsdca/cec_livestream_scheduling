@@ -158,8 +158,8 @@ async function sendEmail(successes, failures) {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: 'shui.bill.chu@gmail.com',
-      pass: 'tcmmgtogvtduznmt', // App password
+      user: config.EMAIL_SENDER,
+      pass: config.EMAIL_PASSWORD,
     },
   });
 
@@ -180,20 +180,11 @@ async function sendEmail(successes, failures) {
     emailBody += `❌ Failures: None`;
   }
 
-  const recipientList = [
-    'shui.bill.chu@gmail.com',
-    'jasontong818@gmail.com',
-    'michael.s.kuo@gmail.com',
-  ];
-
-  //const recipientList = [
-  //  'shui.bill.chu@gmail.com',
-  //  'coutlechu@gmail.com',
-  //];
+  const recipientList = config.EMAIL_RECIPIENTS;
 
   await transporter.sendMail({
-    from: 'shui.bill.chu@gmail.com',
-    to: recipientList.join(', '), 
+    from: config.EMAIL_SENDER,
+    to: recipientList.join(', '),
     subject: 'CEC YouTube Livestream Scheduling Summary',
     text: emailBody,
   });

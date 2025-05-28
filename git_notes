@@ -1,0 +1,15 @@
+-- git push out to github
+ 658  git status
+  659  git add .
+  660  git commit -m "stream id checking"
+  661  git push origin main
+
+-- git pull from github
+  603  git branch
+  604  git pull origin main
+
+-- git pull only 1 file
+git fetch origin
+git restore --source origin/main -- <filename>
+git checkout origin/main -- schedule-all-streams.mjs
+
