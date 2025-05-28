@@ -182,7 +182,7 @@ async function sendEmail(successes, failures) {
 
   await transporter.sendMail({
     from: 'shui.bill.chu@gmail.com',
-    to: 'shui.bill.chu@gmail.com, coutlechu@gmail.com',
+    to: 'shui.bill.chu@gmail.com, jasontong818@gmail.com, michael.s.kuo@gmail.com',
     subject: 'CEC YouTube Livestream Scheduling Summary',
     text: emailBody,
   });
