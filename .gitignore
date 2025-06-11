@@ -2,3 +2,7 @@ node_modules/
 credentials.json
 token.json
 config.mjs
+*.swp
+*.swn
+*.swo
+git_notes

@@ -13,3 +13,10 @@ git fetch origin
 git restore --source origin/main -- <filename>
 git checkout origin/main -- schedule-all-streams.mjs
 
+-- Remove the file from Git tracking (and optionally from disk):
+git rm --cached /mnt/c/Users/shuib/cec_livestream_scheduling/.git_notes.swp
+git rm --cached /mnt/c/Users/shuib/cec_livestream_scheduling/.swn
+git rm --cached /mnt/c/Users/shuib/cec_livestream_scheduling/.swo
+git rm --cached /mnt/c/Users/shuib/cec_livestream_scheduling/.swp
+git commit -m "Remove accidentally committed .swp file"
+git commit -m "timestamp in reporting email and remove committed .swp files"git commit -m "timestamp in reporting email and remove committed .swp files"

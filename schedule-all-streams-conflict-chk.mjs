@@ -247,10 +247,13 @@ async function sendEmail(successes, failures) {
     emailBody += errorLogs.map(log => `- ${log}`).join("\n") + "\n";
   }
 
+  const nextSunday = DateTime.now().setZone("America/Los_Angeles").plus({ days: (7 - DateTime.now().weekday) % 7 || 7 });
+  const formattedNextSunday = nextSunday.toFormat("M/d/yy");
+
   await transporter.sendMail({
     from: config.EMAIL_SENDER,
     to: config.EMAIL_RECIPIENTS.join(", "),
-    subject: "CEC YouTube Livestream Scheduling Summary For This Coming Sunday",
+    subject: `CEC YouTube Livestream Scheduling Summary For This Sunday (${formattedNextSunday})`,
     text: emailBody,
   });
 
