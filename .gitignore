@@ -6,3 +6,4 @@ config.mjs
 *.swn
 *.swo
 git_notes
+token.orig
