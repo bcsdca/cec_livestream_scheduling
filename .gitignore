@@ -1,9 +1,8 @@
 node_modules/
 credentials.json
-token.json
+token*.*
 config.mjs
 *.swp
 *.swn
 *.swo
 git_notes
-token.orig

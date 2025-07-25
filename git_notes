@@ -20,3 +20,26 @@ git rm --cached /mnt/c/Users/shuib/cec_livestream_scheduling/.swo
 git rm --cached /mnt/c/Users/shuib/cec_livestream_scheduling/.swp
 git commit -m "Remove accidentally committed .swp file"
 git commit -m "timestamp in reporting email and remove committed .swp files"git commit -m "timestamp in reporting email and remove committed .swp files"
+
+Remove the file from Git's history (staging area and commit):Remove the file from Git's history (staging area and commit):
+git rm --cached token.orig
+rm token.orig
+git commit --amend
+git push --force origin main
+
+Ignore it going forward:
+echo "token.orig" >> .gitignore
+git add .gitignore
+git commit -m "Add token.orig to .gitignore to avoid committing secrets"
+git push origin main
+
+-- throw away your local changes and just pull the latest from GitHub:
+git fetch origin
+
+# Now pull the latest
+git pull origin main# Reset changes and clean untracked files
+git reset --hard
+git clean -fdn
+
+# Now pull the latest
+git pull origin main

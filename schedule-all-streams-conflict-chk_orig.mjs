@@ -6,8 +6,6 @@ import open from "open";
 import nodemailer from "nodemailer";
 import { DateTime, Interval } from "luxon";
 import { config } from "./config.mjs";
-import { authorize } from "./auth.mjs";
-import { verifyYouTubeAuth } from "./verify-auth.mjs";
 
 const errorLogs = [];
 
@@ -34,10 +32,41 @@ const {
   CHURCH_CHANNEL_ID,
 } = config;
 
+const CREDENTIALS_PATH = "credentials.json";
+const TOKEN_PATH = "token.json";
+const SCOPES = ["https://www.googleapis.com/auth/youtube"];
 const CONFLICT_WINDOW_MINUTES = 90;
 
 const runTime = DateTime.now().setZone("America/Los_Angeles").toFormat("yyyy-MM-dd HH:mm:ss");
 console.log(`\n=== Script run at: ${runTime} PST ===`);
+
+async function authorize() {
+  const credentials = JSON.parse(fs.readFileSync(CREDENTIALS_PATH));
+  const { client_secret, client_id, redirect_uris } = credentials.installed;
+  const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
+
+  if (fs.existsSync(TOKEN_PATH)) {
+    oAuth2Client.setCredentials(JSON.parse(fs.readFileSync(TOKEN_PATH)));
+    return oAuth2Client;
+  }
+
+  const authUrl = oAuth2Client.generateAuthUrl({ access_type: "offline", scope: SCOPES });
+  console.log("Authorize this app by visiting:", authUrl);
+  await open(authUrl);
+
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  return new Promise((resolve) => {
+    rl.question("Enter the code from the page: ", (code) => {
+      rl.close();
+      oAuth2Client.getToken(code, (err, token) => {
+        if (err) return console.error("Error retrieving access token", err);
+        oAuth2Client.setCredentials(token);
+        fs.writeFileSync(TOKEN_PATH, JSON.stringify(token));
+        resolve(oAuth2Client);
+      });
+    });
+  });
+}
 
 async function verifyChannel(auth) {
   const youtube = google.youtube({ version: "v3", auth });
@@ -234,12 +263,6 @@ async function sendEmail(successes, failures) {
 (async () => {
   try {
     const auth = await authorize();
-
-    if (!(await verifyYouTubeAuth(auth))) {
-      console.error("❌ Aborting: YouTube auth is invalid or misconfigured.");
-      process.exit(1);
-    }
-
     if (!(await verifyChannel(auth))) process.exit(1);
 
     const streams = [
