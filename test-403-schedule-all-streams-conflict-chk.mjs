@@ -266,9 +266,9 @@ async function sendEmail(successes, failures) {
     if (!(await verifyChannel(auth))) process.exit(1);
 
     const streams = [
-      { title: "English Sunday Worship", hour: 9, minute: 15, streamId: PERSISTENT_STREAM_ID_SANCTUARY },
-      { title: "Mandarin Sunday Worship 國語主日崇拜", hour: 9, minute: 15, streamId: PERSISTENT_STREAM_ID_FELLOWSHIP },
-      { title: "Cantonese Sunday Worship 粵語主日崇拜", hour: 11, minute: 0, streamId: PERSISTENT_STREAM_ID_SANCTUARY },
+      { title: "English Sunday Worship-Test 403 Forbidden", hour: 9, minute: 15, streamId: "UCZFmzvtF_0ffm0YNxV3o9QQ" },
+      { title: "Mandarin Sunday Worship 國語主日崇拜-Test 403 Forbidden", hour: 9, minute: 15, streamId: "UCZFmzvtF_0ffm0YNxV3o9QQ" },
+      { title: "Cantonese Sunday Worship 粵語主日崇拜-Test 403 Forbidden", hour: 11, minute: 0, streamId: "UCZFmzvtF_0ffm0YNxV3o9QQ" },
     ];
 
     const successes = [];

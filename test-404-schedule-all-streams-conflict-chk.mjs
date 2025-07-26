@@ -175,9 +175,9 @@ async function scheduleLivestream(auth, titlePrefix, hour, minute, streamId) {
   let bindRes;
   try {
     bindRes = await youtube.liveBroadcasts.bind({
-      id: broadcastId,
+      id: "fakeBroadcastId123",
       part: "id,contentDetails",
-      streamId,
+      streamId: "fakeStreamId456",
     });
   } catch (err) {
     handleOAuthError(err);

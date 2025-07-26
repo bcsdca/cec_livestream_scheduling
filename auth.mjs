@@ -88,7 +88,7 @@ export async function authorize() {
   });
 }
 
-function handleOAuthError(error) {
+export function handleOAuthError(error) {
   const status = error?.response?.status;
   const message = error?.message || "Unknown error";
 
@@ -117,7 +117,13 @@ function handleOAuthError(error) {
       console.error("💥 500 - Internal Server Error: YouTube server issue, try again later.");
       break;
     default:
-      console.error("❗ An unexpected error occurred. Check the full stack trace or logs.");
+      console.error("❗ An unexpected error occurred.");
+      if (!status) {
+        console.error("Likely network or unknown error:", error);
+      }
   }
+  // Optionally return false for unrecoverable errors, true for recoverable, etc.
+  return status !== 401 && status !== 403;
 }
+
 
