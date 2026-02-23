@@ -102,7 +102,7 @@ async function hasConflictingBroadcast(auth, streamId, newStartTime) {
           console.error(`  Conflict with existing livestream:`);
           console.error(`- Title: ${item.snippet.title}`);
           console.error(`- Broadcast ID: ${item.id}`);
-          console.error(`- Scheduled Time: ${scheduledStart.toFormat("yyyy-MM-dd HH:mm")} PST`);
+          console.error(`- Scheduled Start Time: ${scheduledStart.toFormat("yyyy-MM-dd HH:mm")} PST`);
           console.error(`- Bound Stream ID: ${boundStreamId}`);
           return true;
         }
@@ -199,11 +199,29 @@ async function scheduleLivestream(auth, titlePrefix, hour, minute, streamId) {
 
   const boundStreamId = bindRes.data.contentDetails.boundStreamId;
 
+  // 🔎 Fetch ingestion stream key
+  let ingestionKey = "Unavailable";
+  try {
+    const streamRes = await youtube.liveStreams.list({
+      part: "cdn",
+      id: boundStreamId,
+    });
+
+    if (streamRes.data.items?.length) {
+      ingestionKey = streamRes.data.items[0].cdn.ingestionInfo.streamName;
+    }
+  } catch (err) {
+    console.error("  Could not retrieve ingestion stream key:", err.message);
+  }
+
   const youtubeLink = `https://www.youtube.com/watch?v=${broadcastId}`;
+
   console.log(`✅ Scheduled livestream: ${title}`);
   console.log(`- Broadcast ID: ${broadcastId}`);
-  console.log(`- Scheduled Time: ${sunday.toFormat("yyyy-MM-dd HH:mm")} PST`);
+  console.log(`- Scheduled Start Time: ${sunday.toFormat("yyyy-MM-dd HH:mm")} PST`);
+  console.log(`- Requested Stream ID: ${streamId}`);
   console.log(`- Bound Stream ID: ${boundStreamId}`);
+  console.log(`- Ingestion Stream Key: ${ingestionKey}`);
   console.log(`- YouTube Link: ${youtubeLink}`);
   console.log("--------------------------------------------------");
 

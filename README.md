@@ -17,6 +17,10 @@ This project automates the scheduling of weekly livestreams for the English, Man
 4. Report
   It will send email to Bill Chu, Jason Tong, Michael Kuo for successful or any failure msg during livestream scheduling. 
 
+5. Error handleing
+  The script will check for any already scheduled stream with the same streamID(or streamKey), within 90 minutes of the purported schedule livestream.
+  The script will exit if this condition is found, and log the unexpected stream info, and unbind the purported schedule stream
+  All errors, like 4xx will be reported in the email messages
 
 - TBD
   setting up the CEC youTube hyperlink for all 3 services youTube link, via Word Press REST API
@@ -30,19 +34,20 @@ This project automates the scheduling of weekly livestreams for the English, Man
 2. Adjust/Create configuration files such as `config.mjs` and `credentials.json` as needed.
    Please keep these files out of the repository to protect sensitive information.
 
-3. Run the main scheduling script using the command `node schedule-all-streams.mjs`.
+3. Run the main scheduling script using the command `node schedule-all-streams-conflict-chk.mjs`.
 
-4. The scheduling script is currently run on a Google Cloud VM.
+4. The scheduling script is currently run on a Google Cloud VM,(or any linux machine)
    You can set up a cron job on the VM to automatically trigger the script at the desired times.
    The VM instance can be managed via Google Cloud Run to start or stop as needed.
 
 ## Notes
 
 - Sensitive files like `credentials.json`, `conig.mls` and `token.json` are ignored by `.gitignore` and must **not** be pushed to GitHub.
-- Manual scheduling is required for special events.
+- Manual scheduling is required for special event livestream.
 - Alternative methods to run the script, such as using a Linux environment on a local PC or laptop, are possible.
 - Ideally, livestream scheduling could be better handled using Google Apps Script within a Google Workspace environment.
-  However, this approach requires the CEC YouTube owner account credentials(login/passwd)
+  because it didn't require a linux vm to run the script.
+  However, this approach requires the CEC YouTube owner account credentials(login/passwd), currently is underinvestigation
 
 ## License
 

@@ -1,0 +1,13 @@
+shuib_wsl@BillChu-laptop:/mnt/c/Users/shuib/cec_livestream_scheduling$ node listStreams.mjs
+Title: CEC Fellowship Hall
+Stream ID: 6GkALNcMtSUssrwWRXgGYQ1770492830832338
+Stream Key: f4b8-0rqe-3dj9-92tt-335c
+--------------------------------------------------
+Title: Default stream key
+Stream ID: 6GkALNcMtSUssrwWRXgGYQ1748301132968938
+Stream Key: ua9r-x04r-gkum-hach-3yet
+--------------------------------------------------
+Title: CEC Sanctuary (60fps)
+Stream ID: 6GkALNcMtSUssrwWRXgGYQ1602798983344529
+Stream Key: 868m-wafx-mdmz-jsbw-8079
+--------------------------------------------------
