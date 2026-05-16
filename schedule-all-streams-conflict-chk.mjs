@@ -35,7 +35,7 @@ const {
   CHURCH_CHANNEL_ID,
 } = config;
 
-const CONFLICT_WINDOW_MINUTES = 90;
+const CONFLICT_WINDOW_MINUTES = 30;
 
 const runTime = DateTime.now().setZone("America/Los_Angeles").toFormat("yyyy-MM-dd HH:mm:ss");
 console.log(`\n=== Script run at: ${runTime} PST ===`);
