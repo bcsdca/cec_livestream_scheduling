@@ -127,6 +127,81 @@ async function hasConflictingBroadcast(auth, streamId, newStartTime) {
   return false;
 }
 
+async function verifyConfiguredStreamIds(auth) {
+  const youtube = google.youtube({ version: "v3", auth });
+
+  // Only check each unique stream ID once.
+  const configuredStreams = [
+    {
+      name: "Sanctuary / Joint Worship",
+      streamId: PERSISTENT_STREAM_ID_SANCTUARY,
+    },
+    {
+      name: "Fellowship / Mandarin",
+      streamId: PERSISTENT_STREAM_ID_FELLOWSHIP,
+    },
+  ];
+
+  console.log("\n=== Preflight Stream ID Check ===");
+
+  let allValid = true;
+
+  for (const stream of configuredStreams) {
+    try {
+      const res = await youtube.liveStreams.list({
+        part: "id,snippet,status,contentDetails",
+        id: stream.streamId,
+      });
+
+      const item = res.data.items?.[0];
+
+      if (!item) {
+        console.error(`❌ ${stream.name} stream does not exist.`);
+        console.error(`- Configured Stream ID: ${stream.streamId}`);
+        allValid = false;
+        continue;
+      }
+
+      // Extra safety: verify this stream belongs to church channel
+      if (item.snippet?.channelId !== CHURCH_CHANNEL_ID) {
+        console.error(`❌ ${stream.name} stream belongs to the wrong channel.`);
+        console.error(`- Stream ID: ${stream.streamId}`);
+        console.error(`- Stream Channel ID: ${item.snippet?.channelId}`);
+        console.error(`- Expected Channel ID: ${CHURCH_CHANNEL_ID}`);
+        allValid = false;
+        continue;
+      }
+
+      console.log(`✅ ${stream.name} stream verified.`);
+      console.log(`- Title: ${item.snippet?.title || "Unknown"}`);
+      console.log(`- Stream ID: ${item.id}`);
+      console.log(`- Status: ${item.status?.streamStatus || "Unknown"}`);
+      console.log(`- Reusable: ${item.contentDetails?.isReusable ?? "Unknown"}`);
+    } catch (err) {
+      handleOAuthError(err);
+      console.error(`❌ Could not verify ${stream.name} stream.`);
+      console.error(`- Stream ID: ${stream.streamId}`);
+      console.error(`- Error: ${err.message}`);
+      allValid = false;
+    }
+  }
+
+  if (!allValid) {
+    console.error(
+      "❌ PRECHECK FAILED: One or more configured YouTube Stream IDs are invalid."
+    );
+    console.error(
+      "❌ No livestream broadcasts will be created."
+    );
+    return false;
+  }
+
+  console.log("✅ All configured YouTube Stream IDs passed preflight check.");
+  console.log("-------------------------------------------");
+
+  return true;
+}
+
 async function scheduleLivestream(auth, titlePrefix, hour, minute, streamId) {
   const youtube = google.youtube({ version: "v3", auth });
   const sunday = getNextSundayDateTime(hour, minute);
@@ -262,14 +337,29 @@ async function sendEmail(successes, failures) {
   const nextSunday = DateTime.now().setZone("America/Los_Angeles").plus({ days: (7 - DateTime.now().weekday) % 7 || 7 });
   const formattedNextSunday = nextSunday.toFormat("M/d/yy");
 
-  await transporter.sendMail({
-    from: config.EMAIL_SENDER,
-    to: config.EMAIL_RECIPIENTS.join(", "),
-    subject: `CEC YouTube Livestream Scheduling Summary For This Sunday (${formattedNextSunday})`,
-    text: emailBody,
-  });
+  try {
+    await transporter.sendMail({
+      from: config.EMAIL_SENDER,
+      to: config.EMAIL_RECIPIENTS.join(", "),
+        subject: `CEC YouTube Livestream Scheduling Summary For This Sunday (${formattedNextSunday})`,
+      text: emailBody,
+    });
 
-  console.log(`✅ Email sent to: ${config.EMAIL_RECIPIENTS.join(", ")}`);
+    console.log(`✅ Email sent to: ${config.EMAIL_RECIPIENTS.join(", ")}`);
+    return true;
+
+  } catch (err) {
+    console.error(`❌ Failed to send summary email: ${err.message}`);
+
+    if (err.code === "EAUTH") {
+      console.error(
+        "❌ Gmail authentication failed. Check EMAIL_SENDER and regenerate the Gmail App Password."
+      );
+    }
+
+    return false;
+  }
+
 }
 
 (async () => {
@@ -278,10 +368,38 @@ async function sendEmail(successes, failures) {
 
     if (!(await verifyYouTubeAuth(auth))) {
       console.error("❌ Aborting: YouTube auth is invalid or misconfigured.");
+
+      await sendEmail([], [{
+        title: "Preflight Authentication Check",
+        error: "YouTube authentication is invalid or misconfigured."
+      }]);
+
       process.exit(1);
     }
 
-    if (!(await verifyChannel(auth))) process.exit(1);
+    if (!(await verifyChannel(auth))) {
+      await sendEmail([], [{
+        title: "Preflight Channel Check",
+        error: "Authenticated YouTube channel does not match the expected church channel."
+      }]);
+
+      process.exit(1);
+    }
+
+    // =========================================================
+    // PRECHECK: Verify configured persistent Stream IDs exist
+    // BEFORE creating any broadcast
+    // =========================================================
+    if (!(await verifyConfiguredStreamIds(auth))) {
+      await sendEmail([], [{
+        title: "Preflight Stream ID Check",
+        error:
+          "One or more configured YouTube Stream IDs no longer exist or belong to the wrong channel. No broadcasts were created."
+      }]);
+
+      process.exit(1);
+    }
+
 
     const streams = [
       { title: "English Sunday Worship", hour: 9, minute: 15, streamId: PERSISTENT_STREAM_ID_SANCTUARY },
