@@ -43,3 +43,22 @@ git clean -fdn
 
 # Now pull the latest
 git pull origin main
+
+# push all the changes out to github.com
+ 2047  git branch -M main
+ 2048  git remote add origin git@github.com:bcsdca/cec_livestream_scheduling.git
+ 2049  git remote set-url origin git@github.com:bcsdca/cec_livestream_scheduling.git
+ 2050  git remote -v
+ 2051  git push origin main --force
+# pull all the changes from github.com
+
+1092  git remote set-url origin git@github.com:bcsdca/cec_livestream_scheduling.git
+ 1093  git remote -v
+ 1094  git fetch origin
+ 1095  git status
+ 1097  git branch -vv
+ 1098  git stash push -u -m "local mac changes before pull"
+ 1099  git pull --ff-only
+ 1101  git stash pop
+ 1103  git status
+
